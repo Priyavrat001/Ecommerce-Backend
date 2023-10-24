@@ -2,28 +2,41 @@ const express = require('express');
 const Product = require('../models/productModel')
 const router = express.Router()
 const ErrorHandler = require("../errorHandler/errorHandler")
-const catchAsyncError = require("../errorHandler/catchAsyncError")
+const catchAsyncError = require("../errorHandler/catchAsyncError");
+const ApiFeatures = require('../middleware/apiFeature');
 
 // Route:1: create  product for admin from "/api/product/createproduct"
-router.post(catchAsyncError('/createproduct', async (req, res, next) => {
+router.post('/createproduct', async (req, res, next) => {
+  try {
     const product = await Product.create(req.body);
     res.status(200).json({
         sucess: true,
         product
-    })
-
-}))
+    });
+  } catch (error) {
+   res.status(400).json({success:false, error:"Internal server error"}) 
+  }
+    
+})
 // Route:2: get all product from "/api/product/updateproduct"
-router.get(catchAsyncError('/getallproduct', async (req, res, next) => {
-    const product = await Product.find();
+router.get('/getallproduct', async (req, res, next) => {
+  try {
+    const resultPage = 5;
+    const apiFeature = new ApiFeatures(Product.find(), req.query).search().filter().pagination(resultPage);
+    const product = await apiFeature.query;
     res.status(200).json({
         sucess: true,
         product
     })
+  } catch (error) {
+    res.status(400).json({success:false, error:"Internal server error"}) 
+  }
 
-}))
+})
 // Route:3: update all product from "/api/product/updateproduct"
-router.put(catchAsyncError('/updateproduct/:id', async (req, res, next) => {
+router.put('/updateproduct/:id', async (req, res, next) => {
+  try {
+    
     let product = await Product.findById(req.params.id);
     if (!product) {
         return next(new ErrorHandler("Product not found", 404))
@@ -34,35 +47,48 @@ router.put(catchAsyncError('/updateproduct/:id', async (req, res, next) => {
         sucess: true,
         product
     })
-}))
+  } catch (error) {
+    res.status(400).json({success:false, error:"Internal server error"}) 
+  }
+})
 // Route:4: delete product by id from "/api/product/updateproduct"
-router.delete(catchAsyncError('/deleteproduct/:id', async (req, res, next) => {
-  
-      let { id } = req.params;
-      let product = await Product.findById(id);
-      if (!product) {
-        return next(new ErrorHandler("Product not found", 404))
-    }
-      else {
-        product = await Product.findByIdAndDelete(id, req.body)
-      }
-      res.status(200).json({
-        sucess: true,
-        message: "Your product is deleted sucessfully."
-      })
-  
-  }))
-  // Route:5: get a single product by id from "/api/product/updateproduct"
-  router.get(catchAsyncError('/getsingleproduct/:id', async(req, res, next)=>{
-    const product = await Product.findById(req.params.id)
+router.delete('/deleteproduct/:id', async (req, res, next) => {
+  try {
+    
+    let { id } = req.params;
+    let product = await Product.findById(id);
     if (!product) {
-        return next(new ErrorHandler("Product not found", 404))
+      return next(new ErrorHandler("Product not found", 404))
+  }
+    else {
+      product = await Product.findByIdAndDelete(id, req.body)
     }
-      res.status(200).json({
-        sucess: true,
-        product
-      })
-  }))
+    res.status(200).json({
+      sucess: true,
+      message: "Your product is deleted sucessfully."
+    })
+  } catch (error) {
+    res.status(400).json({success:false, error:"Internal server error"}) 
+  }
+  
+  
+  })
+  // Route:5: get a single product by id from "/api/product/updateproduct"
+  router.get('/getsingleproduct/:id', async(req, res, next)=>{
+    try {
+      
+      const product = await Product.findById(req.params.id)
+      if (!product) {
+          return next(new ErrorHandler("Product not found", 404))
+      }
+        res.status(200).json({
+          sucess: true,
+          product
+        })
+    } catch (error) {
+      res.status(400).json({success:false, error:"Internal server error"}) 
+    }
+  })
   
 
 module.exports = router;
