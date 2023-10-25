@@ -10,6 +10,9 @@ module.exports = (err, req, res, next)=>{
         const message = `Source not found Error:${err.path}`;
         err = new ErrorHandler(message, 400)
     }
-
+    if (res.headersSent) {
+        const message = `Source not found Error:${err.path}`;
+        err = new ErrorHandler(message, 400)
+      }
     res.status(statusCode).json({success:false, message});
 }

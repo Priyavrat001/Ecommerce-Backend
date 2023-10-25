@@ -2,12 +2,14 @@ const express = require('express');
 const Product = require('../models/productModel')
 const router = express.Router()
 const ErrorHandler = require("../errorHandler/errorHandler")
-const catchAsyncError = require("../errorHandler/catchAsyncError");
+// const catchAsyncError = require("../errorHandler/catchAsyncError");
 const ApiFeatures = require('../middleware/apiFeature');
+const { isAuthenticatedUser, authrizeRoles } = require('../middleware/auth');
 
 // Route:1: create  product for admin from "/api/product/createproduct"
-router.post('/createproduct', async (req, res, next) => {
+router.post('/createproduct',isAuthenticatedUser,authrizeRoles("admin"),  async (req, res, next) => {
   try {
+    req.body.user = req.user.id;
     const product = await Product.create(req.body);
     res.status(200).json({
         sucess: true,
@@ -19,7 +21,7 @@ router.post('/createproduct', async (req, res, next) => {
     
 })
 // Route:2: get all product from "/api/product/updateproduct"
-router.get('/getallproduct', async (req, res, next) => {
+router.get('/getallproduct',async (req, res, next) => {
   try {
     const resultPage = 5;
     const apiFeature = new ApiFeatures(Product.find(), req.query).search().filter().pagination(resultPage);
@@ -34,7 +36,7 @@ router.get('/getallproduct', async (req, res, next) => {
 
 })
 // Route:3: update all product from "/api/product/updateproduct"
-router.put('/updateproduct/:id', async (req, res, next) => {
+router.put('/updateproduct/:id',isAuthenticatedUser,authrizeRoles("admin"),  async (req, res, next) => {
   try {
     
     let product = await Product.findById(req.params.id);
@@ -52,7 +54,7 @@ router.put('/updateproduct/:id', async (req, res, next) => {
   }
 })
 // Route:4: delete product by id from "/api/product/updateproduct"
-router.delete('/deleteproduct/:id', async (req, res, next) => {
+router.delete('/deleteproduct/:id',isAuthenticatedUser,authrizeRoles("admin"),  async (req, res, next) => {
   try {
     
     let { id } = req.params;

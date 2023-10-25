@@ -2,12 +2,12 @@ const express = require('express')
 const app = express()
 const errorMiddleWare = require("./middleware/error")
 const db = require('./db')
-// const cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser');
 const port = 4000
 
 db()
 app.use(express.json())
-// app.use(cookieParser())
+app.use(cookieParser())
 // import all routes here
 const user = require("./routes/userRoute")
 const product = require("./routes/productRoute");
