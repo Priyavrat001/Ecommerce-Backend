@@ -148,7 +148,7 @@ router.put('/updateprofile', isAuthenticatedUser, async(req, res, next)=>{
 })
 
 // Route:6: get all user profile for the admin
-router.put('/getalluser', isAuthenticatedUser,authrizeRoles("admin"), async(req, res, next)=>{
+router.get('/getalluser', isAuthenticatedUser,authrizeRoles("admin"), async(req, res, next)=>{
     try {
        const users = await User.find();
         res.status(200).json({success:true, users});
@@ -158,11 +158,11 @@ router.put('/getalluser', isAuthenticatedUser,authrizeRoles("admin"), async(req,
 })
 
 // Route:7: get single user profile for the admin
-router.put('/getsingleuser/:id', isAuthenticatedUser,authrizeRoles("admin"), async(req, res, next)=>{
+router.get('/getsingleuser/:id', isAuthenticatedUser,authrizeRoles("admin"), async(req, res, next)=>{
     try {
        const user = await User.findById(req.params.id);
        if(!user){
-        return next(new ErrorHandler("Not able to find the user.", 404))
+        return next(new ErrorHandler(`Not able to find the user with user id: ${req.params.id}.`, 404))
        }
         res.status(200).json({success:true, user});
     } catch (error) {
@@ -170,4 +170,41 @@ router.put('/getsingleuser/:id', isAuthenticatedUser,authrizeRoles("admin"), asy
     }
 })
 
+// Route:8: update the user role
+router.put('/updateuserrole', isAuthenticatedUser,authrizeRoles("admin"), async(req, res, next)=>{
+    try {
+        const newUserData = {
+            //make sure user required name and email in your frontend
+            name:req.body.name,
+            email:req.body.email,
+            role:req.body.role,
+        }
+        if(!req.body.name || !req.body.email || !req.body.role){
+            return next(new ErrorHandler("Please enter your name, password and role to update your profile.", 404))
+        }
+        //TODO Cloudinary
+        const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+            new:true,
+            runValidators:true, 
+            userFindModify:false
+        })
+        res.status(200).json({success:true, message:"Updated profile."})
+    } catch (error) {
+        res.status(400).json({success:false, message:"Invalid credatils.", error})
+    }
+})
+
+// Route:9: deleting the user 
+router.delete('/deletuser/:id', isAuthenticatedUser,authrizeRoles("admin"), async(req, res, next)=>{
+    try {
+        // we will remove cloudnery leater
+       const user = await User.findByIdAndDelete(req.params.id, req.user)
+        if(!user){
+            return next(new ErrorHandler(`Not able to find the user you want to delet id:${req.params.id}`, 404))
+        }
+        res.status(200).json({success:true, message:"Deleted user."})
+    } catch (error) {
+        res.status(400).json({success:false, message:"Invalid credatils.", error})
+    }
+})
 module.exports = router;

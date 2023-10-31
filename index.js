@@ -8,11 +8,15 @@ const port = 4000
 db()
 app.use(express.json())
 app.use(cookieParser())
+
 // import all routes here
 const user = require("./routes/userRoute")
 const product = require("./routes/productRoute");
+// const order = require("./routes/orderRoute");
+
 app.use('/api/product', product);
 app.use('/api/user', user);
+// app.use('/api/user', order);
 
 // middleware for the error
 app.use(errorMiddleWare)
