@@ -1,27 +1,29 @@
-const express = require('express')
-const app = express()
-const errorMiddleWare = require("./middleware/error")
-const db = require('./db')
+const express = require('express');
+const app = express();
+const errorMiddleWare = require("./middleware/error");
+var cors = require('cors')
+const db = require('./db');
 const cookieParser = require('cookie-parser');
-const port = 4000
+const port = 5000;
 
 db()
+app.use(cors())
 app.use(express.json())
 app.use(cookieParser())
 
 // import all routes here
 const user = require("./routes/userRoute")
 const product = require("./routes/productRoute");
-// const order = require("./routes/orderRoute");
+const order = require("./routes/orderRoute");
 
 app.use('/api/product', product);
 app.use('/api/user', user);
-// app.use('/api/user', order);
+app.use('/api/order', order);
 
 // middleware for the error
 app.use(errorMiddleWare)
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
+    console.log(`Example app listening on http://localhost:${port}`)
   })
 
   // for my learning purpose how to handle unhandleRejection

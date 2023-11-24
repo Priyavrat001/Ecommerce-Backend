@@ -24,12 +24,11 @@ router.post('/createproduct', isAuthenticatedUser, authrizeRoles("admin"), async
 router.get('/getallproduct', async (req, res, next) => {
   try {
     const resultPage = 5;
+    const productCount= await Product.countDocuments();
     const apiFeature = new ApiFeatures(Product.find(), req.query).search().filter().pagination(resultPage);
     const product = await apiFeature.query;
-    res.status(200).json({
-      sucess: true,
-      product
-    })
+    // console.log(product, productCount)
+    res.status(200).json(product)
   } catch (error) {
     res.status(400).json({ success: false, error: "Internal server error" })
   }

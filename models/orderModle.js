@@ -42,23 +42,23 @@ const orderSchema = new Schema({
     user: {
         type: mongoose.Schema.ObjectId,
         ref: "User",
-        required: true
+        require: true
     },
     paymentInfo: {
         id: {
             type: String,
-            required: true
+            // required: true
         },
         status: {
             type: String,
-            required: true
+            // required: true
         }
     },
     paidAt: {
         type: Date,
         required: true
     },
-    itemPrice: {
+    itemsPrice: {
         type: Number,
         required: true,
         default: 0,
