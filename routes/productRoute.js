@@ -34,6 +34,18 @@ router.get('/getallproduct', async (req, res, next) => {
   }
 
 })
+
+// Route:3: get all product from "/api/product/updateproduct"
+router.get('/getsingleproduct/:id', async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id)
+    res.status(200).json(product)
+  } catch (error) {
+    res.status(400).json({ success: false, error: "Internal server error" })
+  }
+
+})
+
 // Route:3: update all product from "/api/product/updateproduct"
 router.put('/updateproduct/:id', isAuthenticatedUser, authrizeRoles("admin"), async (req, res, next) => {
   try {
@@ -147,7 +159,7 @@ router.get('/getreview', async (req, res, next) => {
     });
   }
 })
-// Route:6: deleting all review and comment from "/api/product/deletereview"
+// Route:7: deleting all review and comment from "/api/product/deletereview"
 router.delete('/deletereview', isAuthenticatedUser, async (req, res, next) => {
   // try {
     const product = await Product.findById(req.query.productId);
